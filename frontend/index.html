@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FightScore Pro - AI Combat Sports Scoring</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body
+    class="bg-gradient-to-br from-slate-800 via-slate-900 to-slate-950 text-white min-h-screen"
+  >
+    <!-- Navigation -->
+    <nav class="bg-white/5 backdrop-blur-lg sticky top-0 z-50">
+      <div
+        class="max-w-7xl mx-auto px-8 py-4 flex justify-between items-center"
+      >
+        <div class="flex items-center gap-2 text-xl font-semibold">
+          <span class="text-2xl">🛡️</span>
+          <span>FightScore Pro</span>
+        </div>
+        <ul class="flex gap-8 list-none">
+          <li>
+            <a
+              href="#home"
+              class="text-white/80 hover:text-white transition-colors no-underline"
+              >Home</a
+            >
+          </li>
+          <li>
+            <a
+              href="#scoring"
+              class="text-white/80 hover:text-white transition-colors no-underline"
+              >Scoring</a
+            >
+          </li>
+          <li>
+            <a
+              href="#contact"
+              class="text-white/80 hover:text-white transition-colors no-underline"
+              >Contact</a
+            >
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <main class="max-w-5xl mx-auto px-8 py-16 text-center">
+      <!-- Badge -->
+      <div
+        class="inline-block bg-red-600 text-white px-6 py-2 rounded-full text-sm font-medium mb-8"
+      >
+        ⭐ AI-Powered Judging System
+      </div>
+
+      <!-- Heading -->
+      <h1 class="text-5xl md:text-6xl font-bold mb-6 leading-tight">
+        AI-Assisted Combat Sports Scoring
+      </h1>
+
+      <!-- Subtitle -->
+      <p class="text-lg text-white/80 mb-12 leading-relaxed max-w-3xl mx-auto">
+        Upload your fight video and let our advanced AI analyze every moment.
+        Get instant, unbiased scoring based on professional judging criteria.
+      </p>
+
+      <!-- Upload Container -->
+      <div
+        id="uploadContainer"
+        class="bg-white/5 border-2 border-dashed border-white/30 rounded-3xl p-16 my-8 cursor-pointer transition-all hover:border-white/50 hover:bg-white/8"
+      >
+        <div class="text-6xl mb-4">☁️</div>
+        <p class="text-xl mb-2">Drop your video here or click to browse</p>
+        <p class="text-white/60 text-sm mb-8">
+          Supports MP4, MOV, AVI (Max 500MB)
+        </p>
+        <input
+          type="file"
+          id="videoInput"
+          accept="video/mp4,video/mov,video/avi"
+          hidden
+        />
+        <button
+          id="uploadBtn"
+          class="bg-red-600 hover:bg-red-700 text-white px-12 py-4 rounded-lg font-semibold transition-colors"
+        >
+          Select Video
+        </button>
+      </div>
+
+      <!-- Video Preview -->
+      <div id="videoPreview" class="hidden my-8">
+        <video
+          id="videoPlayer"
+          controls
+          class="w-full max-w-4xl rounded-xl mb-6 mx-auto"
+        ></video>
+        <div class="text-white/80 mb-6">
+          <p id="fileName" class="mb-2"></p>
+          <p id="fileSize"></p>
+        </div>
+        <button
+          id="analyzeBtn"
+          class="bg-sky-500 hover:bg-sky-600 text-white px-12 py-4 rounded-lg font-semibold transition-colors m-2"
+        >
+          Analyze Fight
+        </button>
+        <button
+          id="changeBtn"
+          class="bg-white/10 hover:bg-white/15 text-white px-12 py-4 rounded-lg font-semibold transition-colors m-2"
+        >
+          Change Video
+        </button>
+      </div>
+
+      <!-- Feature Note -->
+      <div
+        class="bg-white/5 rounded-xl p-6 mt-12 flex items-start gap-4 text-left"
+      >
+        <span class="text-2xl flex-shrink-0">⭐</span>
+        <p class="text-white/80 leading-relaxed">
+          Our AI processes your video frame-by-frame, analyzing striking
+          effectiveness, defense, aggression, and control to provide detailed
+          round-by-round scoring.
+        </p>
+      </div>
+    </main>
+
+    <script src="index.js"></script>
+  </body>
+</html>
