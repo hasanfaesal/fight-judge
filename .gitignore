@@ -1,0 +1,9 @@
+vitvenv/
+output_results/
+output_visualizations_valid/
+sample_data/
+coco-keypoint-mma-fighter-detection-dataset/images/
+coco-keypoint-mma-fighter-detection-dataset/annotations/
+mma-fighter-detection-dataset/**/images/
+mma-fighter-detection-dataset/**/labels/
+annotations/annotations_backup/
