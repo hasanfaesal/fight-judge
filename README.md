@@ -1,5 +1,12 @@
 # fight-judge
 
+
+
+https://github.com/user-attachments/assets/b98d7962-321f-40e1-9638-cb4691a1a56b
+
+
+
+
 An AI system for scoring boxing and MMA fights according to official judging criteria.
 The project builds a full computer-vision pipeline — from raw fight footage to pose-based
 action recognition — with the eventual goal of automated, rule-compliant fight scoring.
