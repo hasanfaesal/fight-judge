@@ -8,15 +8,58 @@ action recognition — with the eventual goal of automated, rule-compliant fight
 
 ---
 
+## Models & Datasets
+
+### Trained Models
+
+| Model | Task | Key Metric | Download |
+|-------|------|------------|----------|
+| **YOLOv8s** (finetuned) | Fighter detection | mAP50-95: **0.984** | [Hugging Face](https://huggingface.co/hasanfaesal/fight-judge-yolov8s) |
+| **YOLO11x-pose** (finetuned) | Pose estimation (17 keypoints) | Pose mAP50-95: **0.920** | [Hugging Face](https://huggingface.co/hasanfaesal/fight-judge-yolov11x-pose) |
+
+### Datasets
+
+| Dataset | Contents | Format | Source |
+|---------|----------|--------|--------|
+| **MMA Fighter Detection** | 5,106 images, 10,186 fighter bboxes, 20 UFC fights | YOLO | [Mendeley Data](https://data.mendeley.com/datasets/c456bnk8bm/1) |
+| **MMA Fighter Pose Estimation** | 5,106 images, 10,155 fighters with 17 COCO keypoints | YOLO-Pose | Auto-generated ([methodology](#pose-dataset-auto-generation)) |
+
+Both datasets use 640×640 px images covering diverse weight classes and fighting styles
+(Poirier, Adesanya, Pereira, Topuria, Gaethje, and others). Licensed under
+[CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/).
+
+---
+
 ## Table of Contents
 
+- [Models & Datasets](#models--datasets)
+- [Quick Start](#quick-start)
 - [Project Overview](#project-overview)
 - [Pipeline Architecture](#pipeline-architecture)
 - [Results & Metrics](#results--metrics)
-- [Dataset](#dataset)
 - [Repository Structure](#repository-structure)
 - [Tech Stack](#tech-stack)
 - [Roadmap](#roadmap)
+
+---
+
+## Quick Start
+
+```python
+from ultralytics import YOLO
+
+# Fighter detection
+detector = YOLO("hasanfaesal/fight-judge-yolov8s")
+detections = detector("fight_frame.jpg")
+
+# Pose estimation
+pose_model = YOLO("hasanfaesal/fight-judge-yolov11x-pose")
+poses = pose_model("fight_frame.jpg")
+
+keypoints = poses[0].keypoints.xy     # [N, 17, 2] — pixel coordinates
+confidence = poses[0].keypoints.conf  # [N, 17]    — per-keypoint confidence
+boxes = poses[0].boxes.xyxy           # [N, 4]     — fighter bounding boxes
+```
 
 ---
 
@@ -27,7 +70,7 @@ whether a pose-estimation-based AI can objectively quantify fighter output — e
 striking, aggression, ring generalship — to assist or replace human judges.
 
 The current phase focuses on building a high-quality, labeled dataset of fighter poses
-across diverse UFC matchups, and training a robust keypoint detection model as the
+across diverse UFC matchups, and training robust detection and keypoint models as the
 foundation for downstream action recognition.
 
 ---
@@ -39,10 +82,10 @@ Stage 1 — Frame Extraction
   scripts/data_preparation/extract-frames.py
   └─ MP4 fight footage → JPEG frames (all frames, no sampling)
 
-Stage 2 — Fighter Detection Annotation
-  [Manual annotation via Roboflow]
-  └─ 5,106 frames labeled with fighter bounding boxes (1 class: "fighter")
-  └─ Dataset: mma-fighter-detection-dataset/ (YOLO format)
+Stage 2 — Fighter Detection
+  Model: YOLOv8s (finetuned) → mAP50-95: 0.984
+  Dataset: MMA Fighter Detection Dataset (5,106 images, YOLO format)
+  └─ Manual annotation via Roboflow, published on Mendeley Data
 
 Stage 3 — Pose Dataset Auto-Generation  ← KEY CONTRIBUTION
   scripts/data_preparation/yolo-to-coco-bbox.py
@@ -50,15 +93,15 @@ Stage 3 — Pose Dataset Auto-Generation  ← KEY CONTRIBUTION
   scripts/pose_estimation/create-pose-dataset-from-object-detection.ipynb
   └─ Runs YOLOv11x-pose on each frame, matches detections to annotated
      fighter bboxes via IoU (threshold 0.6), extracts 17 COCO keypoints
-  └─ Output: pose-detection-yolov11x-dataset/ (YOLO-Pose format)
+  └─ 99.7% match rate (10,155 / 10,186 fighters)
 
 Stage 4 — Annotation Fixing
   scripts/data_preparation/fix_annotations.py
   └─ Normalizes COCO JSON output from ViTPose inference pipeline
 
 Stage 5 — Pose Model Training
-  [YOLO11x-pose finetuned on pose-detection-yolov11x-dataset]
-  [ViTPose run via scripts/pose_estimation/run-inference-batch.py]
+  Model: YOLO11x-pose (finetuned) → Pose mAP50-95: 0.920
+  Dataset: MMA Fighter Pose Estimation Dataset (YOLO-Pose format)
 
 Stage 6 — Visualization & Validation
   scripts/pose_estimation/visualize_pose.py
@@ -78,11 +121,15 @@ Stage 8 — Scoring System  [PLANNED]
 
 ### Fighter Detection (YOLOv8s, finetuned)
 
-| Metric     | Value  |
-|------------|--------|
-| mAP50-95   | **0.983** |
-| Dataset    | 5,106 images, 20 UFC fights |
-| Classes    | 1 (fighter) |
+| Metric      | Value      |
+|-------------|------------|
+| mAP50-95    | **0.984**  |
+| mAP50       | **0.995**  |
+| Precision   | 0.998      |
+| Recall      | 0.999      |
+
+Trained for 100 epochs on 2× GPUs (Kaggle), batch size 64.
+Download: [hasanfaesal/fight-judge-yolov8s](https://huggingface.co/hasanfaesal/fight-judge-yolov8s)
 
 ### Pose Dataset Auto-Generation
 
@@ -97,33 +144,16 @@ Stage 8 — Scoring System  [PLANNED]
 
 ### Pose Estimation (YOLO11x-pose, finetuned)
 
-| Metric   | Value    |
-|----------|----------|
-| Pose mAP | ~88%     |
-| Keypoints | 17 (COCO) |
-| Format   | YOLO-Pose |
+| Metric            | Value      |
+|-------------------|------------|
+| Pose mAP50-95     | **0.920**  |
+| Pose mAP50        | **0.993**  |
+| Box mAP50-95      | **0.986**  |
+| Precision (pose)  | 0.992      |
+| Recall (pose)     | 0.991      |
 
----
-
-## Dataset
-
-**MMA Fighter Detection Dataset**
-- **5,106 images** extracted from 20 UFC fights (stand-up combat phases)
-- **Resolution:** 640×640 px
-- **Format:** YOLO bounding box (1 class: `fighter`)
-- **License:** CC BY-NC-SA 4.0
-- **Published on Mendeley Data:**
-  [https://data.mendeley.com/datasets/c456bnk8bm/1](https://data.mendeley.com/datasets/c456bnk8bm/1)
-
-**Citation:**
-```
-Faisal, Hasan (2025). MMA Fighter Detection Dataset.
-Mendeley Data, V1. doi: 10.17632/c456bnk8bm.1
-```
-
-Fights included span multiple weight classes and feature athletes such as
-Poirier, Adesanya, Pereira, Topuria, Gaethje, and others. Images were
-exported from Roboflow without augmentation to preserve label quality.
+Trained for 150 epochs (resumed from epoch 90) on Tesla P100, AdamW, batch size 8.
+Download: [hasanfaesal/fight-judge-yolov11x-pose](https://huggingface.co/hasanfaesal/fight-judge-yolov11x-pose)
 
 ---
 
@@ -140,9 +170,10 @@ fight-judge/
 │       ├── create-pose-dataset-from-object-detection.ipynb  # Stage 3b: pose labeling
 │       ├── run-inference-batch.py               # Stage 5: ViTPose batch inference
 │       └── visualize_pose.py                    # Stage 6: annotation visualization
+├── dataset/
+│   ├── mma-fighter-detection-dataset/           # Detection dataset (metadata)
+│   └── mma-fighter-pose-estimation-dataset/     # Pose dataset (metadata)
 ├── annotations/                                 # COCO JSON annotations
-├── mma-fighter-detection-dataset/               # YOLO detection dataset (metadata)
-├── pose-detection-yolov11x-dataset/             # YOLO-Pose dataset (labels committed)
 ├── notes/                                       # Technical notes
 │   ├── PoseEstimation.md
 │   └── ActionRecognition.md
@@ -159,11 +190,12 @@ fight-judge/
 | Component            | Technology                          |
 |----------------------|-------------------------------------|
 | Object detection     | YOLOv8s (Ultralytics), finetuned    |
+| Pose estimation      | YOLO11x-pose (Ultralytics), finetuned |
 | Pose labeling        | YOLOv11x-pose (pretrained, Ultralytics) |
-| Pose estimation      | YOLO11x-pose (finetuned), ViTPose (mmpose) |
 | Dataset management   | Roboflow                            |
 | Annotation format    | YOLO (.txt), COCO JSON              |
 | Training platform    | Kaggle (Tesla P100-PCIE-16GB)       |
+| Model hosting        | Hugging Face                        |
 | Language             | Python 3.12                         |
 | Core libraries       | OpenCV, NumPy, Ultralytics, mmpose, tqdm |
 
@@ -175,9 +207,9 @@ fight-judge/
 |-------|------|--------|
 | 1 | Frame extraction | Done |
 | 2 | Fighter detection annotation (Roboflow) | Done |
-| 2 | Fighter detection model training (YOLOv8s) | Done — mAP50-95: 0.983 |
+| 2 | Fighter detection model training (YOLOv8s) | Done — mAP50-95: 0.984 |
 | 3 | Pose dataset auto-generation | Done — 99.7% match rate |
-| 5 | Pose model finetuning (YOLO11x-pose) | Done — ~88% mAP |
+| 5 | Pose model finetuning (YOLO11x-pose) | Done — Pose mAP50-95: 0.920 |
 | 5 | ViTPose inference pipeline | Done |
 | 7 | Action recognition (GCN / Transformer) | Planned |
 | 7 | Strike classification (jab, cross, hook, kick, ...) | Planned |
@@ -188,7 +220,20 @@ fight-judge/
 
 ---
 
+## Citation
+
+```bibtex
+@misc{faisal2025mmafighter,
+  author    = {Hasan Faisal},
+  title     = {MMA Fighter Detection Dataset},
+  year      = {2025},
+  publisher = {Mendeley Data},
+  version   = {V1},
+  doi       = {10.17632/c456bnk8bm.1}
+}
+```
+
 ## License
 
-Code: [MIT License](LICENSE)
+Code & models: [MIT License](LICENSE)
 Dataset: [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/)

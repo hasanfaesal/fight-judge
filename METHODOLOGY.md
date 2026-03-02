@@ -164,9 +164,9 @@ using Ultralytics' default training configuration on a Kaggle Tesla P100-PCIE-16
 
 ### 5.3 Results
 
-| Metric   | Value  |
-|----------|--------|
-| Pose mAP | ~88%   |
+| Metric         | Value  |
+|----------------|--------|
+| Pose mAP50-95  | 0.920  |
 
 ### 5.4 Inference Considerations
 
@@ -176,7 +176,7 @@ rate (25–60 FPS). The tradeoffs for available models are:
 
 | Model         | Approach    | Accuracy | Speed |
 |---------------|-------------|----------|-------|
-| YOLO11x-pose  | One-stage   | ~88% mAP | Fast  |
+| YOLO11x-pose  | One-stage   | 0.920 mAP50-95 | Fast  |
 | ViTPose-B     | Top-down    | Higher   | Slower |
 | RTMO          | One-stage   | Comparable | Fastest |
 | DETRPose      | End-to-end  | High     | Moderate |
