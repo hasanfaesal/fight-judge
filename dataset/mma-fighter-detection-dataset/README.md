@@ -80,11 +80,19 @@ dataset/
 
 The `data.yaml` file contains the configuration for training with YOLOv8.
 
-## 6. How to Use
+## 6. Downloading the Full Dataset
 
-This dataset can be used to train object detection models with the [Ultralytics YOLOv8 framework](https://github.com/ultralytics/yolov8) or any other framework that supports the YOLO annotation format. Simply point the training script to the included `data.yaml` file.
+The images and labels are not included in this repository. Download the full dataset from **Mendeley Data**:
 
-## 7. Citation
+> **[https://data.mendeley.com/datasets/c456bnk8bm/1](https://data.mendeley.com/datasets/c456bnk8bm/1)**
+
+After downloading, extract the contents so that the `train/`, `valid/`, and `test/` folders sit alongside this `README.md`.
+
+## 7. How to Use
+
+This dataset can be used to train object detection models with the [Ultralytics YOLO framework](https://github.com/ultralytics/ultralytics) or any other framework that supports the YOLO annotation format. Simply point the training script to the included `data.yaml` file.
+
+## 8. Citation
 
 If you use this dataset in your research, please cite it as:
 

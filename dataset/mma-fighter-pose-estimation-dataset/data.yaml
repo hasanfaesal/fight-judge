@@ -1,0 +1,20 @@
+train: ../train/images
+val: ../valid/images
+test: ../test/images
+
+nc: 1
+names:
+  - fighter
+
+# 17 COCO keypoints, each with (x, y, visibility)
+kpt_shape: [17, 3]
+
+# Left-right flip indices for augmentation (swaps left↔right keypoints)
+flip_idx: [0, 2, 1, 4, 3, 6, 5, 8, 7, 10, 9, 12, 11, 14, 13, 16, 15]
+
+roboflow:
+  workspace: deep-learning-zhrus
+  project: my-first-project-pucm2
+  version: 4
+  license: BY-NC-SA 4.0
+  url: https://universe.roboflow.com/deep-learning-zhrus/my-first-project-pucm2/dataset/4

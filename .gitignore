@@ -15,6 +15,8 @@ vitvenv/
 venv/
 env/
 
+*.zip
+
 # --- Environment / secrets ---
 .env
 .env.*
@@ -47,14 +49,10 @@ output_visualizations*/
 extracted_frames*/
 sample_data/
 
-# --- Dataset images (large; hosted on Mendeley / Roboflow) ---
-coco-keypoint-mma-fighter-detection-dataset/images/
-coco-keypoint-mma-fighter-detection-dataset/annotations/
-mma-fighter-detection-dataset/**/images/
-mma-fighter-detection-dataset/**/labels/
-archive/**/images/
-archive/**/labels/
-pose-detection-yolov11x-dataset/**/images/
+# --- Dataset images and labels (large; hosted on Mendeley Data) ---
+dataset/**/train/
+dataset/**/valid/
+dataset/**/test/
 
 # --- Annotation backups ---
 annotations/annotations_backup/
