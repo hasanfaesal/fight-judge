@@ -1,3 +1,28 @@
+"""
+Visualize YOLO-Pose annotations overlaid on dataset images.
+
+Used to sanity-check the auto-generated pose labels produced by
+create-pose-dataset-from-object-detection.ipynb. For each image it draws:
+  - Bounding boxes (blue rectangles)
+  - 17 COCO keypoints (red filled circles)
+  - Skeleton connections (green/orange lines following COCO topology)
+
+The script reads YOLO-Pose .txt label files where each line has the format:
+    class_id  x_c  y_c  w  h  kp1_x  kp1_y  kp2_x  kp2_y  ...  kp17_x  kp17_y
+All values are normalized to [0, 1]. Visibility flags are not present in this
+variant of the format (written by the Kaggle notebook).
+
+Usage:
+    python visualize_pose.py <data_dir> [--output_dir OUTPUT_DIR]
+
+    # Visualize test split, save to output_visualizations_test/
+    python visualize_pose.py pose-detection-yolov11x-dataset/test --output_dir output_visualizations_test
+
+Arguments:
+    data_dir      Path to a dataset split directory containing images/ and labels/
+    --output_dir  Directory to save annotated images (default: output_visualizations)
+"""
+
 import cv2
 import numpy as np
 import os
@@ -12,27 +37,59 @@ from pathlib import Path
 # MODIFY THIS if your model has a different number or order of keypoints.
 # The indices correspond to the order of keypoints in your label files (0-indexed).
 SKELETON = [
-    [16, 14], [14, 12], [17, 15], [15, 13], [12, 13], [6, 12], [7, 13],
-    [6, 7], [6, 8], [7, 9], [8, 10], [9, 11], [2, 3], [1, 2], [1, 3],
-    [2, 4], [3, 5], [4, 6], [5, 7]
+    [16, 14],
+    [14, 12],
+    [17, 15],
+    [15, 13],
+    [12, 13],
+    [6, 12],
+    [7, 13],
+    [6, 7],
+    [6, 8],
+    [7, 9],
+    [8, 10],
+    [9, 11],
+    [2, 3],
+    [1, 2],
+    [1, 3],
+    [2, 4],
+    [3, 5],
+    [4, 6],
+    [5, 7],
 ]
 
 # Colors for the skeleton connections (in BGR format)
 # You can add more colors if your skeleton has more connections.
 LIMB_COLORS = [
-    [0, 255, 0], [0, 255, 0], [255, 128, 0], [255, 128, 0], [255, 128, 0],
-    [0, 255, 0], [255, 128, 0], [255, 128, 0], [0, 255, 0], [255, 128, 0],
-    [0, 255, 0], [255, 128, 0], [255, 128, 0], [255, 128, 0], [255, 128, 0],
-    [255, 128, 0], [255, 128, 0], [0, 255, 0], [255, 128, 0]
+    [0, 255, 0],
+    [0, 255, 0],
+    [255, 128, 0],
+    [255, 128, 0],
+    [255, 128, 0],
+    [0, 255, 0],
+    [255, 128, 0],
+    [255, 128, 0],
+    [0, 255, 0],
+    [255, 128, 0],
+    [0, 255, 0],
+    [255, 128, 0],
+    [255, 128, 0],
+    [255, 128, 0],
+    [255, 128, 0],
+    [255, 128, 0],
+    [255, 128, 0],
+    [0, 255, 0],
+    [255, 128, 0],
 ]
 
 # Color for the keypoints (in BGR format)
-KEYPOINT_COLOR = [0, 0, 255] # Red
+KEYPOINT_COLOR = [0, 0, 255]  # Red
 
 # Color for the bounding box (in BGR format)
-BBOX_COLOR = [255, 0, 0] # Blue
+BBOX_COLOR = [255, 0, 0]  # Blue
 
 # --- SCRIPT LOGIC ---
+
 
 def draw_annotations(image_path, label_path, output_path):
     """
@@ -54,11 +111,11 @@ def draw_annotations(image_path, label_path, output_path):
         return
 
     # Read the label file
-    with open(label_path, 'r') as f:
+    with open(label_path, "r") as f:
         for line in f.readlines():
             parts = line.strip().split()
             if len(parts) < 5:
-                continue # Skip malformed lines
+                continue  # Skip malformed lines
 
             # --- 1. Draw Bounding Box ---
             # Parse normalized bbox coordinates
@@ -88,13 +145,19 @@ def draw_annotations(image_path, label_path, output_path):
                 # Parse and denormalize keypoints
                 for i in range(0, len(keypoints_data), 2):
                     kpt_x_norm = float(keypoints_data[i])
-                    kpt_y_norm = float(keypoints_data[i+1])
+                    kpt_y_norm = float(keypoints_data[i + 1])
                     kpt_x = int(kpt_x_norm * img_w)
                     kpt_y = int(kpt_y_norm * img_h)
                     keypoints.append((kpt_x, kpt_y))
 
                     # Draw the keypoint as a circle
-                    cv2.circle(image, (kpt_x, kpt_y), radius=5, color=KEYPOINT_COLOR, thickness=-1)
+                    cv2.circle(
+                        image,
+                        (kpt_x, kpt_y),
+                        radius=5,
+                        color=KEYPOINT_COLOR,
+                        thickness=-1,
+                    )
 
                 # Draw the skeleton lines
                 for i, (p1_idx, p2_idx) in enumerate(SKELETON):
@@ -107,27 +170,38 @@ def draw_annotations(image_path, label_path, output_path):
                     # The SKELETON provided is compatible with this ordering.
                     p1_idx_mapped = p1_idx - 1
                     p2_idx_mapped = p2_idx - 1
-                    
-                    if p1_idx_mapped < len(keypoints) and p2_idx_mapped < len(keypoints):
+
+                    if p1_idx_mapped < len(keypoints) and p2_idx_mapped < len(
+                        keypoints
+                    ):
                         p1 = keypoints[p1_idx_mapped]
                         p2 = keypoints[p2_idx_mapped]
-                        
+
                         # Draw line if both points are detected (not at 0,0)
                         if p1[0] > 0 and p1[1] > 0 and p2[0] > 0 and p2[1] > 0:
                             color = LIMB_COLORS[i % len(LIMB_COLORS)]
                             cv2.line(image, p1, p2, color, thickness=2)
 
-
     # Save the final image
     cv2.imwrite(str(output_path), image)
+
 
 def main():
     """
     Main function to parse arguments and run the visualization process.
     """
-    parser = argparse.ArgumentParser(description="Visualize YOLO Pose annotations on a dataset.")
-    parser.add_argument("data_dir", help="Path to the dataset split directory (e.g., 'test', 'train', or 'valid').")
-    parser.add_argument("--output_dir", default="output_visualizations", help="Directory to save the visualized images.")
+    parser = argparse.ArgumentParser(
+        description="Visualize YOLO Pose annotations on a dataset."
+    )
+    parser.add_argument(
+        "data_dir",
+        help="Path to the dataset split directory (e.g., 'test', 'train', or 'valid').",
+    )
+    parser.add_argument(
+        "--output_dir",
+        default="output_visualizations",
+        help="Directory to save the visualized images.",
+    )
     args = parser.parse_args()
 
     data_path = Path(args.data_dir)
@@ -154,6 +228,7 @@ def main():
         draw_annotations(image_file, label_file, output_file)
 
     print("\nVisualization complete!")
+
 
 if __name__ == "__main__":
     main()

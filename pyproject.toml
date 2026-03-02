@@ -1,10 +1,53 @@
 [project]
 name = "fight-judge"
 version = "0.1.0"
-description = "Add your description here"
+description = "AI pipeline for automated MMA and boxing fight scoring using pose estimation and action recognition"
 readme = "README.md"
 requires-python = ">=3.12"
+license = { text = "MIT" }
+authors = [
+    { name = "Hasan Faisal" }
+]
+keywords = ["computer-vision", "pose-estimation", "action-recognition", "mma", "boxing", "sports-ai"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.12",
+]
+
 dependencies = [
+    # Core numerical / vision
     "numpy>=2.3.4",
     "opencv-python>=4.11.0.86",
+
+    # YOLO object detection and pose estimation (Ultralytics)
+    # Used for: fighter detection (YOLOv8s), pose labeling (YOLOv11x-pose),
+    #           pose model finetuning and inference
+    "ultralytics>=8.3.0",
+
+    # Utility
+    "tqdm>=4.67.0",
 ]
+
+[project.optional-dependencies]
+# mmpose-based inference pipeline (run-inference-batch.py)
+# Install separately: follow https://mmpose.readthedocs.io/en/latest/installation.html
+mmpose = [
+    "torch>=2.0.0",
+    "torchvision>=0.15.0",
+    "mmcv>=2.0.0",
+    "mmpose>=1.0.0",
+    "xtcocotools>=1.12",
+]
+
+# Jupyter notebook environment (create-pose-dataset-from-object-detection.ipynb)
+notebook = [
+    "jupyter>=1.0.0",
+    "ipykernel>=6.0.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

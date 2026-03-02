@@ -1,9 +1,63 @@
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+.Python
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# --- Virtual environments ---
 vitvenv/
+.venv/
+venv/
+env/
+
+# --- Environment / secrets ---
+.env
+.env.*
+
+# --- Model weights and checkpoints ---
+*.pt
+*.pth
+*.onnx
+*.tflite
+*.engine
+*.pkl
+runs/
+
+# --- Jupyter ---
+.ipynb_checkpoints/
+
+# --- IDE ---
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# --- macOS ---
+.DS_Store
+
+# --- Project-specific: script outputs ---
 output_results/
 output_visualizations_valid/
+output_visualizations*/
+extracted_frames*/
 sample_data/
+
+# --- Dataset images (large; hosted on Mendeley / Roboflow) ---
 coco-keypoint-mma-fighter-detection-dataset/images/
 coco-keypoint-mma-fighter-detection-dataset/annotations/
 mma-fighter-detection-dataset/**/images/
 mma-fighter-detection-dataset/**/labels/
+archive/**/images/
+archive/**/labels/
+pose-detection-yolov11x-dataset/**/images/
+
+# --- Annotation backups ---
 annotations/annotations_backup/
+
+# --- Personal Obsidian notes vault (not part of the repo) ---
+fight-judge-notes/
